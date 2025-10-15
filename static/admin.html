@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AwingConnect License Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+        
+        .sidebar {
+            background-color: var(--secondary-color);
+            color: white;
+            height: calc(100vh - 56px);
+            position: fixed;
+            overflow-y: auto;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 0;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #6c757d;
+        }
+        
+        .badge-active {
+            background-color: var(--success-color);
+        }
+        
+        .badge-inactive {
+            background-color: var(--danger-color);
+        }
+        
+        .badge-expired {
+            background-color: var(--warning-color);
+        }
+        
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background-color: var(--primary-color);
+            color: white;
+            margin-left: auto;
+        }
+        
+        .admin-message {
+            background-color: white;
+            border: 1px solid #dee2e6;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .action-btn {
+            margin-right: 5px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-online {
+            background-color: var(--success-color);
+        }
+        
+        .status-offline {
+            background-color: var(--danger-color);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form -->
+    <div id="login-section" class="login-container">
+        <h2 class="text-center mb-4">AwingConnect Admin</h2>
+        <form id="login-form">
+            <div class="mb-3">
+                <label for="username" class="form-label">Tên đăng nhập</label>
+                <input type="text" class="form-control" id="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Mật khẩu</label>
+                <input type="password" class="form-control" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+        </form>
+        <div id="login-error" class="alert alert-danger mt-3 d-none"></div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="d-none">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-shield-alt"></i> AwingConnect Admin
+                </a>
+                <div class="navbar-nav ms-auto">
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i> <span id="current-user">Admin</span>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                    <div class="position-sticky pt-3">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#" data-section="dashboard">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-section="licenses">
+                                    <i class="fas fa-key"></i> Quản lý License
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-section="chat">
+                                    <i class="fas fa-comments"></i> Chat Support
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-section="users">
+                                    <i class="fas fa-users"></i> Quản lý Admin
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-md-9 col-lg-10 main-content">
+                    <!-- Dashboard Section -->
+                    <div id="dashboard-section" class="section">
+                        <h2 class="mb-4">Dashboard</h2>
+                        
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card stat-card">
+                                    <div class="card-body">
+                                        <div class="number text-primary" id="total-licenses">0</div>
+                                        <div class="label">Tổng số License</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stat-card">
+                                    <div class="card-body">
+                                        <div class="number text-success" id="active-licenses">0</div>
+                                        <div class="label">License đang hoạt động</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stat-card">
+                                    <div class="card-body">
+                                        <div class="number text-warning" id="expired-licenses">0</div>
+                                        <div class="label">License hết hạn</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stat-card">
+                                    <div class="card-body">
+                                        <div class="number text-danger" id="unread-messages">0</div>
+                                        <div class="label">Tin nhắn chưa đọc</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-line"></i> Hoạt động gần đây
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="recent-activity">Đang tải...</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-exclamation-circle"></i> Cảnh báo
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="alerts">Đang tải...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- License Management Section -->
+                    <div id="licenses-section" class="section d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2>Quản lý License</h2>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createLicenseModal">
+                                <i class="fas fa-plus"></i> Tạo License mới
+                            </button>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Danh sách License</span>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="show-active-only">
+                                    <label class="form-check-label" for="show-active-only">Chỉ hiển thị license đang hoạt động</label>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="licenses-table">
+                                        <thead>
+                                            <tr>
+                                                <th>License Key</th>
+                                                <th>Khách hàng</th>
+                                                <th>Ngày tạo</th>
+                                                <th>Ngày hết hạn</th>
+                                                <th>Trạng thái</th>
+                                                <th>HWID</th>
+                                                <th>Số lần sử dụng</th>
+                                                <th>Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="licenses-tbody">
+                                            <!-- License data will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Section -->
+                    <div id="chat-section" class="section d-none">
+                        <h2 class="mb-4">Chat Support</h2>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-users"></i> Người dùng đang hoạt động
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <ul class="list-group list-group-flush" id="active-users">
+                                            <!-- Active users will be listed here -->
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <span id="chat-with">Chọn người dùng để chat</span>
+                                        <div>
+                                            <span class="status-indicator status-offline" id="user-status"></span>
+                                            <small id="last-seen"></small>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="chat-container" id="chat-messages">
+                                            <!-- Chat messages will be displayed here -->
+                                        </div>
+                                        <div class="p-3 border-top">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="message-input" placeholder="Nhập tin nhắn..." disabled>
+                                                <button class="btn btn-primary" id="send-message" disabled>
+                                                    <i class="fas fa-paper-plane"></i> Gửi
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Admin Users Section -->
+                    <div id="users-section" class="section d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2>Quản lý Admin</h2>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                                <i class="fas fa-user-plus"></i> Thêm Admin
+                            </button>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                Danh sách Admin
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="users-table">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Tên đăng nhập</th>
+                                                <th>Ngày tạo</th>
+                                                <th>Trạng thái</th>
+                                                <th>Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="users-tbody">
+                                            <!-- Admin users will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create License Modal -->
+    <div class="modal fade" id="createLicenseModal" tabindex="-1" aria-labelledby="createLicenseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createLicenseModalLabel">Tạo License mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-license-form">
+                        <div class="mb-3">
+                            <label for="days-valid" class="form-label">Số ngày hiệu lực</label>
+                            <input type="number" class="form-control" id="days-valid" value="30" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer-name" class="form-label">Tên khách hàng (tùy chọn)</label>
+                            <input type="text" class="form-control" id="customer-name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer-email" class="form-label">Email khách hàng (tùy chọn)</label>
+                            <input type="email" class="form-control" id="customer-email">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="create-license-btn">Tạo License</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createUserModalLabel">Thêm Admin mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-user-form">
+                        <div class="mb-3">
+                            <label for="new-username" class="form-label">Tên đăng nhập</label>
+                            <input type="text" class="form-control" id="new-username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new-password" class="form-label">Mật khẩu</label>
+                            <input type="password" class="form-control" id="new-password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm-password" class="form-label">Xác nhận mật khẩu</label>
+                            <input type="password" class="form-control" id="confirm-password" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="create-user-btn">Tạo Admin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit License Modal -->
+    <div class="modal fade" id="editLicenseModal" tabindex="-1" aria-labelledby="editLicenseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editLicenseModalLabel">Chỉnh sửa License</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-license-form">
+                        <input type="hidden" id="edit-license-key">
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="edit-is-active">
+                            <label class="form-check-label" for="edit-is-active">Kích hoạt license</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-days-to-add" class="form-label">Thêm số ngày (tùy chọn)</label>
+                            <input type="number" class="form-control" id="edit-days-to-add" min="0">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="save-license-btn">Lưu thay đổi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // API Configuration
+        const API_BASE = 'http://localhost:8000/api';
+        let authToken = null;
+        let currentUser = null;
+        let selectedUser = null;
+        let refreshInterval = null;
+
+        // DOM Elements
+        const loginSection = document.getElementById('login-section');
+        const adminDashboard = document.getElementById('admin-dashboard');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const currentUserSpan = document.getElementById('current-user');
+        const logoutBtn = document.getElementById('logout-btn');
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.sidebar .nav-link');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            const savedToken = localStorage.getItem('adminToken');
+            const savedUser = localStorage.getItem('adminUser');
+            
+            if (savedToken && savedUser) {
+                authToken = savedToken;
+                currentUser = savedUser;
+                showAdminDashboard();
+            }
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Login form
+            loginForm.addEventListener('submit', handleLogin);
+            
+            // Logout button
+            logoutBtn.addEventListener('click', handleLogout);
+            
+            // Navigation
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                    
+                    // Update active nav link
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // License management
+            document.getElementById('show-active-only').addEventListener('change', function() {
+                loadLicenses(this.checked);
+            });
+            
+            document.getElementById('create-license-btn').addEventListener('click', createLicense);
+            
+            // Chat
+            document.getElementById('send-message').addEventListener('click', sendMessage);
+            document.getElementById('message-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Admin users
+            document.getElementById('create-user-btn').addEventListener('click', createAdminUser);
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    currentUser = data.username;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('adminToken', authToken);
+                    localStorage.setItem('adminUser', currentUser);
+                    
+                    showAdminDashboard();
+                } else {
+                    const error = await response.json();
+                    showLoginError(error.detail || 'Đăng nhập thất bại');
+                }
+            } catch (error) {
+                showLoginError('Lỗi kết nối đến server');
+            }
+        }
+
+        function showLoginError(message) {
+            loginError.textContent = message;
+            loginError.classList.remove('d-none');
+        }
+
+        function showAdminDashboard() {
+            loginSection.classList.add('d-none');
+            adminDashboard.classList.remove('d-none');
+            currentUserSpan.textContent = currentUser;
+            
+            // Load initial data
+            loadDashboardStats();
+            loadLicenses(false);
+            loadAdminUsers();
+            
+            // Start auto-refresh
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(loadDashboardStats, 30000); // Refresh every 30 seconds
+            
+            // Show dashboard by default
+            showSection('dashboard');
+        }
+
+        async function handleLogout() {
+            try {
+                await fetch(`${API_BASE}/admin/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            } finally {
+                // Clear local storage and reset state
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                authToken = null;
+                currentUser = null;
+                
+                // Stop auto-refresh
+                if (refreshInterval) clearInterval(refreshInterval);
+                
+                // Show login screen
+                adminDashboard.classList.add('d-none');
+                loginSection.classList.remove('d-none');
+                loginForm.reset();
+                loginError.classList.add('d-none');
+            }
+        }
+
+        function showSection(sectionName) {
+            sections.forEach(section => {
+                if (section.id === `${sectionName}-section`) {
+                    section.classList.remove('d-none');
+                    
+                    // Load section-specific data
+                    if (sectionName === 'dashboard') {
+                        loadDashboardStats();
+                    } else if (sectionName === 'chat') {
+                        loadActiveUsers();
+                    }
+                } else {
+                    section.classList.add('d-none');
+                }
+            });
+        }
+
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Update stats cards
+                    document.getElementById('total-licenses').textContent = data.licenses.total;
+                    document.getElementById('active-licenses').textContent = data.licenses.active;
+                    document.getElementById('expired-licenses').textContent = data.licenses.expired;
+                    document.getElementById('unread-messages').textContent = data.chat.unread_messages;
+                    
+                    // Update recent activity
+                    document.getElementById('recent-activity').innerHTML = `
+                        <p>Có <strong>${data.recent_activity}</strong> license được sử dụng trong 7 ngày qua</p>
+                        <p>Tổng số tin nhắn: <strong>${data.chat.total_messages}</strong></p>
+                        <p>Số admin đang hoạt động: <strong>${data.admins.active}</strong></p>
+                    `;
+                    
+                    // Update alerts
+                    const alerts = [];
+                    if (data.licenses.expired > 0) {
+                        alerts.push(`Có <strong>${data.licenses.expired}</strong> license đã hết hạn`);
+                    }
+                    if (data.chat.unread_messages > 0) {
+                        alerts.push(`Có <strong>${data.chat.unread_messages}</strong> tin nhắn chưa đọc`);
+                    }
+                    
+                    if (alerts.length > 0) {
+                        document.getElementById('alerts').innerHTML = alerts.map(alert => `<div class="alert alert-warning">${alert}</div>`).join('');
+                    } else {
+                        document.getElementById('alerts').innerHTML = '<div class="alert alert-success">Không có cảnh báo nào</div>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+
+        async function loadLicenses(activeOnly = false) {
+            try {
+                const response = await fetch(`${API_BASE}/licenses?active_only=${activeOnly}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const tbody = document.getElementById('licenses-tbody');
+                    
+                    tbody.innerHTML = data.licenses.map(license => `
+                        <tr>
+                            <td><code>${license.key}</code></td>
+                            <td>${license.customer_name || 'N/A'}</td>
+                            <td>${formatDate(license.created_at)}</td>
+                            <td>${formatDate(license.expires_at)}</td>
+                            <td>
+                                ${license.is_active 
+                                    ? (license.is_expired 
+                                        ? '<span class="badge badge-expired">Hết hạn</span>' 
+                                        : '<span class="badge badge-active">Đang hoạt động</span>')
+                                    : '<span class="badge badge-inactive">Không hoạt động</span>'
+                                }
+                            </td>
+                            <td>${license.hwid || 'Chưa kích hoạt'}</td>
+                            <td>${license.used_count}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary action-btn" onclick="editLicense('${license.key}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteLicense('${license.key}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading licenses:', error);
+            }
+        }
+
+        async function createLicense() {
+            const daysValid = document.getElementById('days-valid').value;
+            const customerName = document.getElementById('customer-name').value;
+            const customerEmail = document.getElementById('customer-email').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/create_license`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        days_valid: parseInt(daysValid),
+                        customer_name: customerName || null,
+                        customer_email: customerEmail || null
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Close modal and reset form
+                    bootstrap.Modal.getInstance(document.getElementById('createLicenseModal')).hide();
+                    document.getElementById('create-license-form').reset();
+                    
+                    // Show success message and reload licenses
+                    alert(`License đã được tạo: ${data.license_key}`);
+                    loadLicenses(false);
+                } else {
+                    const error = await response.json();
+                    alert(`Lỗi: ${error.detail}`);
+                }
+            } catch (error) {
+                console.error('Error creating license:', error);
+                alert('Lỗi kết nối đến server');
+            }
+        }
+
+        async function editLicense(licenseKey) {
+            // In a real implementation, you would fetch the current license data
+            // For now, we'll just set the license key and show the modal
+            document.getElementById('edit-license-key').value = licenseKey;
+            
+            const modal = new bootstrap.Modal(document.getElementById('editLicenseModal'));
+            modal.show();
+        }
+
+        async function saveLicenseChanges() {
+            const licenseKey = document.getElementById('edit-license-key').value;
+            const isActive = document.getElementById('edit-is-active').checked;
+            const daysToAdd = document.getElementById('edit-days-to-add').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/licenses/${licenseKey}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        is_active: isActive,
+                        days_to_add: daysToAdd ? parseInt(daysToAdd) : null
+                    })
+                });
+                
+                if (response.ok) {
+                    // Close modal and reset form
+                    bootstrap.Modal.getInstance(document.getElementById('editLicenseModal')).hide();
+                    document.getElementById('edit-license-form').reset();
+                    
+                    // Show success message and reload licenses
+                    alert('License đã được cập nhật');
+                    loadLicenses(false);
+                } else {
+                    const error = await response.json();
+                    alert(`Lỗi: ${error.detail}`);
+                }
+            } catch (error) {
+                console.error('Error updating license:', error);
+                alert('Lỗi kết nối đến server');
+            }
+        }
+
+        async function deleteLicense(licenseKey) {
+            if (!confirm(`Bạn có chắc chắn muốn xóa license ${licenseKey}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/licenses/${licenseKey}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    alert('License đã được xóa');
+                    loadLicenses(false);
+                } else {
+                    const error = await response.json();
+                    alert(`Lỗi: ${error.detail}`);
+                }
+            } catch (error) {
+                console.error('Error deleting license:', error);
+                alert('Lỗi kết nối đến server');
+            }
+        }
+
+        async function loadActiveUsers() {
+            try {
+                // In a real implementation, you would fetch active users from the API
+                // For now, we'll simulate with some dummy data
+                const activeUsers = [
+                    { license_key: 'AWC-123456-ABCD', hwid: 'HWID001', last_seen: new Date().toISOString() },
+                    { license_key: 'AWC-789012-EFGH', hwid: 'HWID002', last_seen: new Date(Date.now() - 300000).toISOString() }
+                ];
+                
+                const activeUsersList = document.getElementById('active-users');
+                activeUsersList.innerHTML = activeUsers.map(user => `
+                    <li class="list-group-item user-item" data-license="${user.license_key}" data-hwid="${user.hwid}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="status-indicator status-online"></span>
+                                <strong>${user.license_key}</strong>
+                            </div>
+                            <small>${formatTimeAgo(user.last_seen)}</small>
+                        </div>
+                        <div class="text-muted small">${user.hwid}</div>
+                    </li>
+                `).join('');
+                
+                // Add click event to user items
+                document.querySelectorAll('.user-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const licenseKey = this.getAttribute('data-license');
+                        const hwid = this.getAttribute('data-hwid');
+                        selectUser(licenseKey, hwid);
+                    });
+                });
+            } catch (error) {
+                console.error('Error loading active users:', error);
+            }
+        }
+
+        function selectUser(licenseKey, hwid) {
+            selectedUser = { licenseKey, hwid };
+            
+            // Update UI
+            document.getElementById('chat-with').textContent = `Chat với ${licenseKey}`;
+            document.getElementById('user-status').className = 'status-indicator status-online';
+            document.getElementById('last-seen').textContent = 'Online';
+            document.getElementById('message-input').disabled = false;
+            document.getElementById('send-message').disabled = false;
+            
+            // Load chat messages
+            loadChatMessages(licenseKey);
+        }
+
+        async function loadChatMessages(licenseKey) {
+            try {
+                const response = await fetch(`${API_BASE}/get_messages?license_key=${licenseKey}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const chatContainer = document.getElementById('chat-messages');
+                    
+                    chatContainer.innerHTML = data.messages.map(message => `
+                        <div class="message ${message.sender_type === 'admin' ? 'admin-message' : 'user-message'}">
+                            <div>${message.message}</div>
+                            <div class="message-time">${formatDateTime(message.timestamp)}</div>
+                        </div>
+                    `).join('');
+                    
+                    // Scroll to bottom
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error loading chat messages:', error);
+            }
+        }
+
+        async function sendMessage() {
+            if (!selectedUser) return;
+            
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/send_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        license_key: selectedUser.licenseKey,
+                        hwid: selectedUser.hwid,
+                        message: message,
+                        sender_type: 'admin'
+                    })
+                });
+                
+                if (response.ok) {
+                    // Clear input and reload messages
+                    messageInput.value = '';
+                    loadChatMessages(selectedUser.licenseKey);
+                } else {
+                    const error = await response.json();
+                    alert(`Lỗi: ${error.detail}`);
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Lỗi kết nối đến server');
+            }
+        }
+
+        async function loadAdminUsers() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/users`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const tbody = document.getElementById('users-tbody');
+                    
+                    tbody.innerHTML = data.users.map(user => `
+                        <tr>
+                            <td>${user.id}</td>
+                            <td>${user.username}</td>
+                            <td>${formatDate(user.created_at)}</td>
+                            <td>
+                                ${user.is_active 
+                                    ? '<span class="badge badge-active">Đang hoạt động</span>' 
+                                    : '<span class="badge badge-inactive">Không hoạt động</span>'
+                                }
+                            </td>
+                            <td>
+                                ${user.username !== currentUser 
+                                    ? `<button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteAdminUser('${user.username}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>`
+                                    : '<span class="text-muted">Tài khoản hiện tại</span>'
+                                }
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading admin users:', error);
+            }
+        }
+
+        async function createAdminUser() {
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (password !== confirmPassword) {
+                alert('Mật khẩu xác nhận không khớp');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/create_user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+                
+                if (response.ok) {
+                    // Close modal and reset form
+                    bootstrap.Modal.getInstance(document.getElementById('createUserModal')).hide();
+                    document.getElementById('create-user-form').reset();
+                    
+                    // Show success message and reload users
+                    alert('Admin đã được tạo');
+                    loadAdminUsers();
+                } else {
+                    const error = await response.json();
+                    alert(`Lỗi: ${error.detail}`);
+                }
+            } catch (error) {
+                console.error('Error creating admin user:', error);
+                alert('Lỗi kết nối đến server');
+            }
+        }
+
+        async function deleteAdminUser(username) {
+            if (!confirm(`Bạn có chắc chắn muốn xóa admin ${username}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/users/${username}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    alert('Admin đã được xóa');
+                    loadAdminUsers();
+                } else {
+                    const error = await response.json();
+                    alert(`Lỗi: ${error.detail}`);
+                }
+            } catch (error) {
+                console.error('Error deleting admin user:', error);
+                alert('Lỗi kết nối đến server');
+            }
+        }
+
+        // Utility functions
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN');
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleString('vi-VN');
+        }
+
+        function formatTimeAgo(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return 'Vừa xong';
+            if (diffMins < 60) return `${diffMins} phút trước`;
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours} giờ trước`;
+            
+            const diffDays = Math.floor(diffHours / 24);
+            return `${diffDays} ngày trước`;
+        }
+
+        // Make functions available globally for onclick handlers
+        window.editLicense = editLicense;
+        window.deleteLicense = deleteLicense;
+        window.deleteAdminUser = deleteAdminUser;
+        window.saveLicenseChanges = saveLicenseChanges;
+    </script>
+</body>
+</html>
